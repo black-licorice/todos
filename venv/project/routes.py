@@ -1,14 +1,31 @@
-from flask import Blueprint, flash, redirect, url_for, render_template, request, get_flashed_messages
-from flask import Blueprint, render_template, redirect, url_for, flash, get_flashed_messages, request
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_required, current_user, logout_user, login_user
+import os
 import datetime
+from flask import Flask, Blueprint, flash, redirect, url_for, render_template, request, get_flashed_messages
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager login_required, current_user, logout_user, login_user
 from time import sleep
 from .models import Todo, User
-from . import db
 
 
-main = Blueprint('main', __name__)
+db = SQLAlchemy()
+main = Flask(__name__)
+
+main.config['SECRET_KEY'] = os.getenv('SECRET')
+main.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+db.init_app(main)
+
+login_manager = LoginManager()
+login_manager.login_view = 'main.login'
+login_manager.init_app(main)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    # because user_id is primary key:
+    return User.query.get(int(user_id))
+
 
 @main.route('/', methods=['GET'])
 def index():
