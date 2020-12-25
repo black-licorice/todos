@@ -1,2 +1,2 @@
-web: gunicorn routes:app -w 4
+web: gunicorn routes:app
 heroku ps:scale worker=1
