@@ -3,7 +3,7 @@ import datetime
 from flask import Flask, Blueprint, flash, redirect, url_for, render_template, request, get_flashed_messages
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, login_required, current_user, logout_user, login_user
+from flask_login import LoginManager, login_required, current_user, logout_user, login_user, UserMixin
 from time import sleep
 from project.models import Todos, User
 
@@ -25,6 +25,29 @@ login_manager.init_app(main)
 def load_user(user_id):
     # because user_id is primary key:
     return User.query.get(int(user_id))
+
+
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100))
+    name = db.Column(db.String(1000))
+    def __repr__(self):
+        return '<User %r>' % self.id
+
+
+class Todo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    person_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    content = db.Column(db.String(200), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    email_me = db.Column(db.Boolean, default=False)
+    email_date = db.Column(db.DateTime)
+    def __repr__(self):
+        return '<Todo %r>' % self.id
+
+
 
 
 @main.route('/', methods=['GET'])
