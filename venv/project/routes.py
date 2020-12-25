@@ -3,7 +3,7 @@ import datetime
 from flask import Flask, Blueprint, flash, redirect, url_for, render_template, request, get_flashed_messages
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager login_required, current_user, logout_user, login_user
+from flask_login import LoginManager, login_required, current_user, logout_user, login_user
 from time import sleep
 from .models import Todo, User
 
