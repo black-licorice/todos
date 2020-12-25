@@ -85,7 +85,7 @@ def index_post():
             return redirect('/')
         except:
             flash('There was a problem adding your todo')
-            return redirect(url_for('app.index'))
+            return redirect(url_for('index'))
     flash('Please sign in to do that')
     return redirect(url_for('app.login'))
 
@@ -102,7 +102,7 @@ def delete(id):
         except:
             return 'There was a probleme deleting that todo'
     flash('You do not have permission to do that')
-    return redirect(url_for('app.index'))
+    return redirect(url_for('index'))
 
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
@@ -120,7 +120,7 @@ def update(id):
         else:
             return render_template('updateTodo.html', todo=todo)
     flash('You do not have permission to do that')
-    return redirect(url_for('app.index'))
+    return redirect(url_for('index'))
 
 
 @app.route('/login', methods=['GET'])
@@ -138,7 +138,7 @@ def login_post():
         flash('Please check your email and password and try again')
         return redirect(url_for('app.login'))
     login_user(user, remember=remember)
-    return redirect(url_for('app.index'))
+    return redirect(url_for('index'))
 
 
 @app.route('/register', methods=['GET'])
