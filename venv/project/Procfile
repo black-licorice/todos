@@ -1,1 +1,1 @@
-web: gunicorn routes:main --preload -b 0.0.0.0:5000
+gunicorn routes:main -b :8080 --timeout 120 --workers=3 --threads=3 --worker-connections=1000
