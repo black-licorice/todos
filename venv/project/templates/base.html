@@ -18,19 +18,19 @@
                 <div class="container">
                     <div id="navbarMenuHeroA" class="navbar-menu">
                         <div class="navbar-end">
-                            <a href="{{ url_for('main.index') }}" class="navbar-item">
+                            <a href="{{ url_for('app.index') }}" class="navbar-item">
                                 Home
                             </a>
                             {% if not current_user.is_authenticated %}
-                            <a href="{{ url_for('main.login') }}" class="navbar-item">
+                            <a href="{{ url_for('app.login') }}" class="navbar-item">
                                 Login
                             </a>
-                            <a href="{{ url_for('main.register') }}" class="navbar-item">
+                            <a href="{{ url_for('app.register') }}" class="navbar-item">
                                 Sign Up
                             </a>
                             {% endif %}
                             {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('main.logout') }}" class="navbar-item">
+                            <a href="{{ url_for('app.logout') }}" class="navbar-item">
                                 Logout
                             </a>
                             {% endif %}

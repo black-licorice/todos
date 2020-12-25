@@ -8,16 +8,16 @@ from time import sleep
 
 
 db = SQLAlchemy()
-main = Flask(__name__)
+app = Flask(__name__)
 
-main.config['SECRET_KEY'] = os.getenv('SECRET')
-main.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SECRET_KEY'] = os.getenv('SECRET')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
-db.init_app(main)
+db.init_app(app)
 
 login_manager = LoginManager()
-login_manager.login_view = 'main.login'
-login_manager.init_app(main)
+login_manager.login_view = 'app.login'
+login_manager.init_app(app)
 
 
 @login_manager.user_loader
@@ -49,7 +49,7 @@ class Todo(db.Model):
 
 
 
-@main.route('/', methods=['GET'])
+@app.route('/', methods=['GET'])
 def index():
     if current_user.is_authenticated:
         # print(db.session.query(Todo).filter_by(person_id=current_user.id).all()[0].email_date)
@@ -67,7 +67,7 @@ def index():
     print(datetime.datetime.utcnow())
     return render_template('todos.html', datetime=datetime.datetime)
 
-@main.route('/', methods=['POST'])
+@app.route('/', methods=['POST'])
 @login_required
 def index_post():
     if current_user.is_authenticated:
@@ -88,12 +88,12 @@ def index_post():
             return redirect('/')
         except:
             flash('There was a problem adding your todo')
-            return redirect(url_for('main.index'))
+            return redirect(url_for('app.index'))
     flash('Please sign in to do that')
-    return redirect(url_for('main.login'))
+    return redirect(url_for('app.login'))
 
 
-@main.route('/delete/<int:id>')
+@app.route('/delete/<int:id>')
 @login_required
 def delete(id):
     todo_to_delete = Todo.query.get_or_404(id)
@@ -105,10 +105,10 @@ def delete(id):
         except:
             return 'There was a probleme deleting that todo'
     flash('You do not have permission to do that')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('app.index'))
 
 
-@main.route('/update/<int:id>', methods=['GET', 'POST'])
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
 @login_required
 def update(id):
     todo = Todo.query.get_or_404(id)
@@ -123,15 +123,15 @@ def update(id):
         else:
             return render_template('updateTodo.html', todo=todo)
     flash('You do not have permission to do that')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('app.index'))
 
 
-@main.route('/login', methods=['GET'])
+@app.route('/login', methods=['GET'])
 def login():
     return render_template('login.html')
 
 
-@main.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login_post():
     email = request.form.get('email')
     password = request.form.get('password')
@@ -139,17 +139,17 @@ def login_post():
     user = User.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password, password):
         flash('Please check your email and password and try again')
-        return redirect(url_for('main.login'))
+        return redirect(url_for('app.login'))
     login_user(user, remember=remember)
-    return redirect(url_for('main.index'))
+    return redirect(url_for('app.index'))
 
 
-@main.route('/register', methods=['GET'])
+@app.route('/register', methods=['GET'])
 def register():
     return render_template('register.html')
 
 
-@main.route('/register', methods=['POST'])
+@app.route('/register', methods=['POST'])
 def register_post():
     email = request.form.get('email')
     name = request.form.get('name')
@@ -159,17 +159,17 @@ def register_post():
     if db.session.query(User).filter_by(email=email).first():
         # this return will short circuit the route, redirecting to the signup get route
         flash('Email address already exists')
-        return redirect(url_for('main.register'))
+        return redirect(url_for('app.register'))
     # user is created and added to db
     new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
     db.session.add(new_user)
     db.session.commit()
     # redirecrts to login route
-    return redirect(url_for('main.login'))
+    return redirect(url_for('app.login'))
 
-@main.route('/logout')
+@app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.login'))
+    return redirect(url_for('app.login'))
 
