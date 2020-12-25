@@ -16,7 +16,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db.init_app(app)
 
 login_manager = LoginManager()
-login_manager.login_view = 'app.login'
+login_manager.login_view = 'login'
 login_manager.init_app(app)
 
 
@@ -87,7 +87,7 @@ def index_post():
             flash('There was a problem adding your todo')
             return redirect(url_for('index'))
     flash('Please sign in to do that')
-    return redirect(url_for('app.login'))
+    return redirect(url_for('login'))
 
 
 @app.route('/delete/<int:id>')
@@ -136,7 +136,7 @@ def login_post():
     user = User.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password, password):
         flash('Please check your email and password and try again')
-        return redirect(url_for('app.login'))
+        return redirect(url_for('login'))
     login_user(user, remember=remember)
     return redirect(url_for('index'))
 
@@ -156,17 +156,17 @@ def register_post():
     if db.session.query(User).filter_by(email=email).first():
         # this return will short circuit the route, redirecting to the signup get route
         flash('Email address already exists')
-        return redirect(url_for('app.register'))
+        return redirect(url_for('register'))
     # user is created and added to db
     new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
     db.session.add(new_user)
     db.session.commit()
     # redirecrts to login route
-    return redirect(url_for('app.login'))
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('app.login'))
+    return redirect(url_for('login'))
 
