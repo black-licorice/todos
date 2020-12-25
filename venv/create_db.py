@@ -1,2 +1,2 @@
-from project.routes import db
+from .project.routes import db
 db.create_all()
