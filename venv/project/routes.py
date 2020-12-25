@@ -62,9 +62,6 @@ def index():
         flash('No todos, please add a todo')
         return render_template('todos.html', datetime=datetime.datetime)
     flash('Sign in to start adding todos')
-    todo_list = Todo.query.filter_by(email_me=True).order_by(Todo.email_date.desc()).all()
-    print(todo_list[0].email_date)
-    print(datetime.datetime.utcnow())
     return render_template('todos.html', datetime=datetime.datetime)
 
 @app.route('/', methods=['POST'])
