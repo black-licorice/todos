@@ -9,12 +9,12 @@ def create_app():
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = os.getenv('SECRET')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
     db.init_app(app)
 
     login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'main.login'
     login_manager.init_app(app)
 
     from .models import User
@@ -23,10 +23,6 @@ def create_app():
         # because user_id is primary key:
         return User.query.get(int(user_id))
 
-
-    # BLUEPRINT FOR AUTH ROUTES
-    from .auth import auth as auth_bluieprint
-    app.register_blueprint(auth_bluieprint)
 
     # BLUEPRINT FOR EVERYTHING ELSE
     from .routes import main as main_blueprint

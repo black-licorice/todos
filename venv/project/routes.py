@@ -1,9 +1,12 @@
-from flask import Blueprint, flash, redirect, url_for, render_template, request
-from flask_login import login_required, current_user
+from flask import Blueprint, flash, redirect, url_for, render_template, request, get_flashed_messages
+from flask import Blueprint, render_template, redirect, url_for, flash, get_flashed_messages, request
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_required, current_user, logout_user, login_user
 import datetime
 from time import sleep
 from .models import Todo, User
 from . import db
+
 
 main = Blueprint('main', __name__)
 
@@ -28,24 +31,27 @@ def index():
 @main.route('/', methods=['POST'])
 @login_required
 def index_post():
-    todo_content = request.form.get('content')
-    new_todo = Todo(content=todo_content, person_id=current_user.id)
-    new_todo.email_me = True if request.form.get('email_me') else False
-    if new_todo.email_me:
-        date_in = request.form.get('email_date')
-        date_processing = date_in.replace('T', '-').replace(':', '-').split('-')
-        date_processing = [int(v) for v in date_processing]
-        date_out = datetime.datetime(*date_processing)
-        new_todo.email_date = date_out
-    else:
-        new_todo.email_date = None
-    try:
-        db.session.add(new_todo)
-        db.session.commit()
-        return redirect('/')
-    except:
-        flash('There was a problem adding your todo')
-        return redirect(url_for('main.index'))
+    if current_user.is_authenticated:
+        todo_content = request.form.get('content')
+        new_todo = Todo(content=todo_content, person_id=current_user.id)
+        new_todo.email_me = True if request.form.get('email_me') else False
+        if new_todo.email_me:
+            date_in = request.form.get('email_date')
+            date_processing = date_in.replace('T', '-').replace(':', '-').split('-')
+            date_processing = [int(v) for v in date_processing]
+            date_out = datetime.datetime(*date_processing)
+            new_todo.email_date = date_out
+        else:
+            new_todo.email_date = None
+        try:
+            db.session.add(new_todo)
+            db.session.commit()
+            return redirect('/')
+        except:
+            flash('There was a problem adding your todo')
+            return redirect(url_for('main.index'))
+    flash('Please sign in to do that')
+    return redirect(url_for('main.login'))
 
 
 @main.route('/delete/<int:id>')
@@ -79,4 +85,52 @@ def update(id):
             return render_template('updateTodo.html', todo=todo)
     flash('You do not have permission to do that')
     return redirect(url_for('main.index'))
+
+
+@main.route('/login', methods=['GET'])
+def login():
+    return render_template('login.html')
+
+
+@main.route('/login', methods=['POST'])
+def login_post():
+    email = request.form.get('email')
+    password = request.form.get('password')
+    remember = True if request.form.get('remember') else False
+    user = User.query.filter_by(email=email).first()
+    if not user or not check_password_hash(user.password, password):
+        flash('Please check your email and password and try again')
+        return redirect(url_for('main.login'))
+    login_user(user, remember=remember)
+    return redirect(url_for('main.index'))
+
+
+@main.route('/register', methods=['GET'])
+def register():
+    return render_template('register.html')
+
+
+@main.route('/register', methods=['POST'])
+def register_post():
+    email = request.form.get('email')
+    name = request.form.get('name')
+    password = request.form.get('password')
+
+    # if user query returns a value for the email field, the email is then already tied to a user
+    if db.session.query(User).filter_by(email=email).first():
+        # this return will short circuit the route, redirecting to the signup get route
+        flash('Email address already exists')
+        return redirect(url_for('main.register'))
+    # user is created and added to db
+    new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
+    db.session.add(new_user)
+    db.session.commit()
+    # redirecrts to login route
+    return redirect(url_for('main.login'))
+
+@main.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('main.login'))
 
