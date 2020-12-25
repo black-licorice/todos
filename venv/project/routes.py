@@ -6,9 +6,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, current_user, logout_user, login_user, UserMixin
 from time import sleep
 
-app = Flask(__name__)
-db = SQLAlchemy(app)
 
+db = SQLAlchemy()
+app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
