@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, current_user, logout_user, login_user
 from time import sleep
-from .models import Todo, User
+from project.models import Todos, User
 
 
 db = SQLAlchemy()
