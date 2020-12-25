@@ -1,2 +1,2 @@
 web: gunicorn routes:app -w 4
-heroku ps:scale web=2
+heroku ps:scale web=1
