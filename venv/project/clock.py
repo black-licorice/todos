@@ -10,7 +10,6 @@ email_time_list = db.session.query(Todo).filter_by(email_me=True).order_by(Todo.
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job('interval', seconds=30)
 def timed_job():
     time = datetime.datetime.utcnow()
     for todo in email_time_list:
@@ -28,3 +27,5 @@ def timed_job():
             mailServer.sendmail(gmailaddress, mailto, message)
             mailServer.quit()
 
+
+job = scheduler.add_job(timed_job, 'interval', seconds=30)
