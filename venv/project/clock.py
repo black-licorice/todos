@@ -1,17 +1,18 @@
 # timed email
-from project.routes import User, Todo
 import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 
+from project.routes import User, Todo
+email_time_list = db.session.query(Todo).filter_by(email_me=True).order_by(Todo.email_date.desc()).all()
 
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', minutes=3)
+
+@sched.scheduled_job('interval', seconds=30)
 def timed_job():
     time = datetime.datetime.utcnow()
-    email_time_list = db.session.query(Todo).filter_by(email_me=True).order_by(Todo.email_date.desc()).all()
     for todo in email_time_list:
         if todo.email_date.strftime('%H:%M') == time.strftime('%H:%M'):
             import smtplib
