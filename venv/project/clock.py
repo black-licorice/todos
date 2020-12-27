@@ -1,6 +1,8 @@
 # timed email
 import datetime
+import os
 from apscheduler.schedulers.blocking import BlockingScheduler
+
 
 
 from project.routes import User, Todo
