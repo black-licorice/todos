@@ -76,9 +76,11 @@ def index_post():
             new_todo.email_date = date_out
             # todo_arr.append(new_todo)
             todo_file = open('todos.csv', 'w')
-            todo_file.write(f"{new_todo.person_id}, {new_todo.email_date}")
+            todo_file.write(f"{new_todo.person_id}, {new_todo.email_date}, {new_todo.content}")
+            todo_file.close()
             user_file = open('users.csv', 'w')
             user_file.write(f"{User.query.filter_by(id=new_todo.person_id).all()[0].id}, {User.query.filter_by(id=new_todo.person_id).all()[0].email}")
+            user_file.close()
             # user_arr.append([User.query.filter_by(id=new_todo.person_id).all()[0].id,
                              # User.query.filter_by(id=new_todo.person_id).all()[0].email])
         else:
