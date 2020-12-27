@@ -7,7 +7,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', seconds=3)
+@sched.scheduled_job('interval', seconds=50)
 def timed_job():
     time = datetime.datetime.now()
     for line in open('project/todos.csv', 'r'):
