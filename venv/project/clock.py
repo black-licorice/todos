@@ -32,3 +32,6 @@ def main():
     scheduler.add_job(timed_job, 'interval', name="mainTask", seconds=30, misfire_grace_time=60)
     scheduler.start()
     return 0
+
+
+main()
