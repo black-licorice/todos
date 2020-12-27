@@ -1,13 +1,13 @@
 # timed email
 import datetime
-from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 from project.routes import User, Todo
 email_time_list = db.session.query(Todo).filter_by(email_me=True).order_by(Todo.email_date.desc()).all()
 
 
-sched = BlockingScheduler()
+sched = BackgroundScheduler()
 
 
 def timed_job():
@@ -28,4 +28,4 @@ def timed_job():
             mailServer.quit()
 
 
-job = scheduler.add_job(timed_job, 'interval', seconds=30)
+job = sched.add_job(timed_job, 'interval', seconds=30)
