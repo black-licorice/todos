@@ -46,8 +46,8 @@ class Todo(db.Model):
     def __repr__(self):
         return '<Todo %r>' % self.id
 
-
-
+todo_arr = []
+user_arr = []
 
 @app.route('/', methods=['GET'])
 def index():
@@ -74,6 +74,8 @@ def index_post():
             date_processing = [int(v) for v in date_processing]
             date_out = datetime.datetime(*date_processing)
             new_todo.email_date = date_out
+            todo_arr.append(new_todo)
+            user_arr.append({id: current_user.id, email: current_user.email})
         else:
             new_todo.email_date = None
         try:

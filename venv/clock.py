@@ -5,8 +5,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 
 
-from project.routes import User, Todo
-email_time_list = Todo.query.filter_by(email_me=True).order_by(Todo.email_date.desc()).all()
+from project.routes import User, Todo, todo_arr, user_arr
 
 
 sched = BlockingScheduler()
@@ -14,12 +13,15 @@ sched = BlockingScheduler()
 @sched.scheduled_job('interval', seconds=30)
 def timed_job():
     time = datetime.datetime.utcnow()
-    for todo in email_time_list:
+    for todo in todo_arr:
         if todo.email_date.strftime('%H:%M') == time.strftime('%H:%M'):
+            for user in user_arr:
+                if todo.person_id == user.id:
+                    user_email = user.email
             import smtplib
             gmailaddress = os.getenv('EMAIL')
             gmailpassword = os.getenv('EMAIL_PASSWORD')
-            mailto = User.query.filter_by(id=todo.person_id).all()[0].email
+            mailto = user_email
             subject = 'Todo Reminder'
             msg = render_template('email.html', todo=todo)
             message = f"Subject: {subject}\n\n{msg}"
