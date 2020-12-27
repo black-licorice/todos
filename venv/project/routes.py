@@ -52,10 +52,7 @@ class Todo(db.Model):
 @app.route('/', methods=['GET'])
 def index():
     if current_user.is_authenticated:
-        # print(db.session.query(Todo).filter_by(person_id=current_user.id).all()[0].email_date)
-        # print(db.session.query(Todo).filter_by(person_id=current_user.id).all()[0].email_me)
         print(datetime.datetime.utcnow().date())
-        #  OLD Todo.query.order_by(Todo.date_added).all()
         todos = Todo.query.filter_by(person_id=current_user.id).order_by(Todo.date_added.desc()).all()
         if todos:
             return render_template('todos.html', todos=todos, datetime=datetime.datetime)
@@ -171,28 +168,3 @@ def register_post():
 def logout():
     logout_user()
     return redirect(url_for('login'))
-
-# timed email
-from apscheduler.schedulers.blocking import BlockingScheduler
-
-sched = BlockingScheduler()
-
-@sched.scheduled_job('interval', minutes=3)
-def timed_job():
-    time = datetime.datetime.utcnow()
-    email_time_list = Todo.query.filter_by(person_id=current_user.id).order_by(Todo.date_added.desc()).all()
-    for todo in email_time_list:
-        if todo.email_date.strftime('%H:%M') == time.strftime('%H:%M'):
-            import smtplib
-            gmailaddress = 'todos.reminder.emailer@gmail.com'
-            gmailpassword = '{3HM(a7e`+)3JJ"]/e/6ZME'
-            mailto = 'judahtrem11@gmail.com'
-            subject = 'Success'
-            msg = render_template('Email.html', todo=todo)
-            message = f"Subject: {subject}\n\n{msg}"
-            mailServer = smtplib.SMTP('smtp.gmail.com', 587)
-            mailServer.starttls()
-            mailServer.login(gmailaddress, gmailpassword)
-            mailServer.sendmail(gmailaddress, mailto, message)
-            mailServer.quit()
-
