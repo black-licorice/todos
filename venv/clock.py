@@ -5,8 +5,8 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 
 
-from project.routes import db, User, Todo
-email_time_list = db.session.query(Todo).filter_by(email_me=True).order_by(Todo.email_date.desc()).all()
+from project.routes import User, Todo
+email_time_list = Todo.query.filter_by(email_me=True).order_by(Todo.email_date.desc()).all()
 
 
 sched = BlockingScheduler()
@@ -19,7 +19,7 @@ def timed_job():
             import smtplib
             gmailaddress = os.getenv('EMAIL')
             gmailpassword = os.getenv('EMAIL_PASSWORD')
-            mailto = db.session.query(User).filter_by(id=todo.person_id).all()[0].email
+            mailto = User.query.filter_by(id=todo.person_id).all()[0].email
             subject = 'Todo Reminder'
             msg = render_template('email.html', todo=todo)
             message = f"Subject: {subject}\n\n{msg}"
