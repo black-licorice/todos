@@ -74,9 +74,13 @@ def index_post():
             date_processing = [int(v) for v in date_processing]
             date_out = datetime.datetime(*date_processing)
             new_todo.email_date = date_out
-            todo_arr.append(new_todo)
-            user_arr.append([User.query.filter_by(id=new_todo.person_id).all()[0].id,
-                             User.query.filter_by(id=new_todo.person_id).all()[0].email])
+            # todo_arr.append(new_todo)
+            todo_file = open('todos.csv', 'w')
+            todo_file.write(f"{new_todo.person_id}, {new_todo.email_date}")
+            user_file = open('users.csv', 'w')
+            user_file.write(f"{User.query.filter_by(id=new_todo.person_id).all()[0].id}, {User.query.filter_by(id=new_todo.person_id).all()[0].email}")
+            # user_arr.append([User.query.filter_by(id=new_todo.person_id).all()[0].id,
+                             # User.query.filter_by(id=new_todo.person_id).all()[0].email])
         else:
             new_todo.email_date = None
         try:
