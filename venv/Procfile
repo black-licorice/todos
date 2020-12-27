@@ -1,2 +1,3 @@
 web: gunicorn project.routes:app -w 4
-heroku clock: python clock.py --loglevel=INFO ps:scale web=1 clock=1
+clock: python clock.py --loglevel=INFO
+heroku ps:scale web=1 clock=1
