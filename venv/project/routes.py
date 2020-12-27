@@ -75,7 +75,8 @@ def index_post():
             date_out = datetime.datetime(*date_processing)
             new_todo.email_date = date_out
             todo_arr.append(new_todo)
-            user_arr.append({id: current_user.id, email: User.query.filter_by(id=current_user.id).all()[0].email})
+            user_arr.append([User.query.filter_by(id=new_todo.person_id).all()[0].id,
+                             User.query.filter_by(id=new_todo.person_id).all()[0].email])
         else:
             new_todo.email_date = None
         try:

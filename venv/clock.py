@@ -16,8 +16,8 @@ def timed_job():
     for todo in todo_arr:
         if todo.email_date.strftime('%H:%M') == time.strftime('%H:%M'):
             for user in user_arr:
-                if todo.person_id == user.id:
-                    user_email = user.email
+                if todo.person_id == user[0]:
+                    user_email = user[1]
             import smtplib
             gmailaddress = os.getenv('EMAIL')
             gmailpassword = os.getenv('EMAIL_PASSWORD')
