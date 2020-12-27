@@ -151,22 +151,48 @@ def register_post():
     email = request.form.get('email')
     name = request.form.get('name')
     password = request.form.get('password')
-
-    # if user query returns a value for the email field, the email is then already tied to a user
-    if db.session.query(User).filter_by(email=email).first():
-        # this return will short circuit the route, redirecting to the signup get route
-        flash('Email address already exists')
-        return redirect(url_for('register'))
-    # user is created and added to db
-    new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
-    db.session.add(new_user)
-    db.session.commit()
-    # redirecrts to login route
-    return redirect(url_for('login'))
+    if email and name and password:
+        # if user query returns a value for the email field, the email is then already tied to a user
+        if db.session.query(User).filter_by(email=email).first():
+            # this return will short circuit the route, redirecting to the signup get route
+            flash('Email address already exists')
+            return redirect(url_for('register'))
+        # user is created and added to db
+        new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
+        db.session.add(new_user)
+        db.session.commit()
+        # redirecrts to login route
+        return redirect(url_for('login'))
+    flash('Please fill out the form')
+    return redirect(url_for('register'))
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+# timed email
+from apscheduler.schedulers.blocking import BlockingScheduler
+
+sched = BlockingScheduler()
+
+@sched.scheduled_job('interval', minutes=3)
+def timed_job():
+    time = datetime.datetime.utcnow()
+    email_time_list = Todo.query.filter_by(person_id=current_user.id).order_by(Todo.date_added.desc()).all()
+    for todo in email_time_list:
+        if todo.email_date.strftime('%H:%M') == time.strftime('%H:%M'):
+            import smtplib
+            gmailaddress = 'todos.reminder.emailer@gmail.com'
+            gmailpassword = '{3HM(a7e`+)3JJ"]/e/6ZME'
+            mailto = 'judahtrem11@gmail.com'
+            subject = 'Success'
+            msg = render_template('Email.html', todo=todo)
+            message = f"Subject: {subject}\n\n{msg}"
+            mailServer = smtplib.SMTP('smtp.gmail.com', 587)
+            mailServer.starttls()
+            mailServer.login(gmailaddress, gmailpassword)
+            mailServer.sendmail(gmailaddress, mailto, message)
+            mailServer.quit()
 
