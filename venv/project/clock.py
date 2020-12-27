@@ -7,6 +7,9 @@ from project.routes import User, Todo
 email_time_list = db.session.query(Todo).filter_by(email_me=True).order_by(Todo.email_date.desc()).all()
 
 
+sched = BlockingScheduler()
+
+@sched.scheduled_job('interval', seconds=30)
 def timed_job():
     time = datetime.datetime.utcnow()
     for todo in email_time_list:
@@ -25,13 +28,4 @@ def timed_job():
             mailServer.quit()
 
 
-
-def main():
-
-    scheduler = BlockingScheduler()
-    scheduler.add_job(timed_job, 'interval', name="mainTask", seconds=30, misfire_grace_time=60)
-    scheduler.start()
-    return 0
-
-
-main()
+sched.start()
