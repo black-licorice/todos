@@ -13,21 +13,21 @@ def timed_job():
     time = datetime.datetime.now()
     todo_file = open('project/todos.csv', 'r')
     for line in todo_file:
-        print(line)
+        sys.stdout.write(line)
         email_date = line.split(',')[1][1:].split(' ')[0]
-        print(email_date)
+        sys.stdout.write(email_date)
         if email_date == str(time).split(' ')[0]:
             email_time= line.split(',')[1][1:].split(' ')[1][0:5]
-            print(email_time)
-            print(time.strftime('%H:%M'))
+            sys.stdout.write(email_time)
+            sys.stdout.write(time.strftime('%H:%M'))
             if email_time == time.strftime('%H:%M'):
                 user_file = open('project/users.csv', 'r')
                 for user in user_file:
-                    print(line.split(',')[0])
-                    print(user.split(',')[0])
+                    sys.stdout.write(line.split(',')[0])
+                    sys.stdout.write(user.split(',')[0])
                     if line.split(',')[0] == user.split(',')[0]:
                         user_email = user.split(',')[1][1:]
-                        print(user_email)
+                        sys.stdout.write(user_email)
                         import smtplib
                         gmailaddress = os.getenv('EMAIL')
                         gmailpassword = os.getenv('EMAIL_PASSWORD')
