@@ -10,7 +10,7 @@ sched = BlockingScheduler()
 @sched.scheduled_job('interval', seconds=2)
 def timed_job():
     time = datetime.datetime.now()
-    todo_file = open('todos.csv', 'r')
+    todo_file = open('project/todos.csv', 'r')
     for line in todo_file:
         print(line)
         email_date = line.split(',')[1][1:].split(' ')[0]
@@ -20,7 +20,7 @@ def timed_job():
             print(email_time)
             print(time.strftime('%H:%M'))
             if email_time == time.strftime('%H:%M'):
-                user_file = open('users.csv', 'r')
+                user_file = open('project/users.csv', 'r')
                 for user in user_file:
                     print(line.split(',')[0])
                     print(user.split(',')[0])
