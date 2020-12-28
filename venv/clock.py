@@ -1,6 +1,7 @@
 # timed email
 import datetime
 import os
+import sys
 from flask import render_template
 from apscheduler.schedulers.blocking import BlockingScheduler
 
@@ -39,6 +40,7 @@ def timed_job():
                         mailServer.login(gmailaddress, gmailpassword)
                         mailServer.sendmail(gmailaddress, mailto, message)
                         mailServer.quit()
+    sys.stdout.flush()
 
 
 timed_job()
