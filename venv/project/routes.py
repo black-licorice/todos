@@ -91,10 +91,10 @@ def timed_email():
     for todo in db.session.query(Todo).filter_by(email_me=True).all():
         if str(todo.email_date).split(',')[0][0:10] == str(time).split(' ')[0]:
             email_time = str(todo.email_date).split(',')[0].split(' ')[1][0:5]
+            print(time, email_time, todo.content)
             if email_time == time.strftime('%H:%M'):
                 user = db.session.query(User).filter_by(id=todo.person_id).all()
                 user_email = user[0].email
-                print(time, email_time, todo.content)
                 import smtplib
                 gmailaddress = os.getenv('EMAIL')
                 gmailpassword = os.getenv('EMAIL_PASSWORD')
