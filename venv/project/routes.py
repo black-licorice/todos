@@ -88,14 +88,16 @@ def index_post():
 
 def timed_email():
     time = datetime.datetime.now()
-    print('starting timed email at: ', time)
     for todo in db.session.query(Todo).filter_by(email_me=True).all():
         print(todo)
         if str(todo.email_date).split(',')[0][0:10] == str(time).split(' ')[0]:
             email_time = str(todo.email_date).split(',')[0].split(' ')[1][0:5]
+            print(email_time, time)
             if email_time == time.strftime('%H:%M'):
                 user = db.session.query(User).filter_by(id=todo.person_id).all()
+                print(user)
                 user_email = user[0].email
+                print(user_email)
                 import smtplib
                 gmailaddress = os.getenv('EMAIL')
                 gmailpassword = os.getenv('EMAIL_PASSWORD')
