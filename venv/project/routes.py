@@ -94,7 +94,7 @@ def timed_email():
             if email_time == time.strftime('%H:%M'):
                 user = db.session.query(User).filter_by(id=todo.person_id).all()
                 user_email = user[0].email
-                print(user_email)
+                print(time, email_time, todo.content)
                 import smtplib
                 gmailaddress = os.getenv('EMAIL')
                 gmailpassword = os.getenv('EMAIL_PASSWORD')
