@@ -1,6 +1,6 @@
-import os
 import datetime
-import csv
+import os
+import pytz
 from flask import Flask, Blueprint, flash, redirect, url_for, render_template, request, get_flashed_messages
 from flask_apscheduler import APScheduler
 from flask_sqlalchemy import SQLAlchemy
@@ -72,7 +72,7 @@ def index_post():
             date_processing = date_in.replace('T', '-').replace(':', '-').split('-')
             date_processing = [int(v) for v in date_processing]
             date_out = datetime.datetime(*date_processing)
-            new_todo.email_date = date_out
+            new_todo.email_date = date_out.astimezone(pytz.utc)
         else:
             new_todo.email_date = None
         try:
@@ -87,15 +87,12 @@ def index_post():
 
 
 def timed_email():
-    time = datetime.datetime.now()
+    time = datetime.datetime.utcnow()
     for todo in db.session.query(Todo).filter_by(email_me=True).all():
         if str(todo.email_date).split(',')[0][0:10] == str(time).split(' ')[0]:
             email_time = str(todo.email_date).split(',')[0].split(' ')[1][0:5]
-            print(todo)
-            print(email_time, time.strftime('%H:%M'))
             if email_time == time.strftime('%H:%M'):
                 user = db.session.query(User).filter_by(id=todo.person_id).all()
-                print(user)
                 user_email = user[0].email
                 print(user_email)
                 import smtplib
