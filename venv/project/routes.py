@@ -87,7 +87,7 @@ def index_post():
 
 
 def timed_email():
-    time = datetime.datetime.utcnow()
+    time = datetime.datetime.now().astimezone(pytz.utc)
     for todo in db.session.query(Todo).filter_by(email_me=True).all():
         if str(todo.email_date).split(',')[0][0:10] == str(time).split(' ')[0]:
             email_time = str(todo.email_date).split(',')[0].split(' ')[1][0:5]
