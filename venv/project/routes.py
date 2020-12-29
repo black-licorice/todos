@@ -52,7 +52,6 @@ class Todo(db.Model):
 @app.route('/', methods=['GET'])
 def index():
     if current_user.is_authenticated:
-        print(datetime.datetime.utcnow().date())
         todos = Todo.query.filter_by(person_id=current_user.id).order_by(Todo.date_added.desc()).all()
         if todos:
             return render_template('todos.html', todos=todos, datetime=datetime.datetime)
@@ -86,8 +85,10 @@ def index_post():
     flash('Please sign in to do that')
     return redirect(url_for('login'))
 
+
 def timed_email():
     time = datetime.datetime.now()
+    print('starting timed email at: ', time)
     for todo in db.session.query(Todo).filter_by(email_me=True).all():
         if str(todo.email_date).split(',')[0][0:10] == str(time).split(' ')[0]:
             email_time = str(todo.email_date).split(',')[0].split(' ')[1][0:5]
@@ -106,10 +107,6 @@ def timed_email():
                 mailServer.login(gmailaddress, gmailpassword)
                 mailServer.sendmail(gmailaddress, mailto, message)
                 mailServer.quit()
-
-
-
-
 
 
 @app.route('/delete/<int:id>')
