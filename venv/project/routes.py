@@ -194,6 +194,7 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-
-scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', seconds=30)
-scheduler.start()
+if __name__ == '__main__':
+    scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', seconds=30)
+    scheduler.start()
+    app.run()
