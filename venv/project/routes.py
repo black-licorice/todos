@@ -72,7 +72,8 @@ def index_post():
             date_processing = date_in.replace('T', '-').replace(':', '-').split('-')
             date_processing = [int(v) for v in date_processing]
             date_out = datetime.datetime(*date_processing)
-            new_todo.email_date = date_out.astimezone(pytz.utc)
+            new_todo.email_date = date_out.astimezone(tz=pytz.utc)
+            print(new_todo.email_date)
         else:
             new_todo.email_date = None
         try:
