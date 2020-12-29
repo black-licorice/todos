@@ -87,7 +87,7 @@ def index_post():
 
 
 def timed_email():
-    time = datetime.datetime.utcnow()
+    time = datetime.datetime.now()
     for todo in db.session.query(Todo).filter_by(email_me=True).all():
         if str(todo.email_date).split(',')[0][0:10] == str(time).split(' ')[0]:
             email_time = str(todo.email_date).split(',')[0].split(' ')[1][0:5]
@@ -194,7 +194,6 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-if __name__ == '__main__':
-    scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', seconds=30)
-    scheduler.start()
-    app.run()
+
+scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', seconds=30)
+scheduler.start()
