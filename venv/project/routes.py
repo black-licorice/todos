@@ -195,5 +195,5 @@ def logout():
     return redirect(url_for('login'))
 
 
-scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', minute=1)
+scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', minutes=1)
 scheduler.start()
