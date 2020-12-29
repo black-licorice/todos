@@ -1,14 +1,16 @@
 import os
 import datetime
+import csv
 from flask import Flask, Blueprint, flash, redirect, url_for, render_template, request, get_flashed_messages
+from flask_apscheduler import APScheduler
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, current_user, logout_user, login_user, UserMixin
-from time import sleep
 
 
-db = SQLAlchemy()
 app = Flask(__name__)
+db = SQLAlchemy(app=app)
+scheduler = APScheduler()
 
 app.config['SECRET_KEY'] = os.getenv('SECRET')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
@@ -46,8 +48,6 @@ class Todo(db.Model):
     def __repr__(self):
         return '<Todo %r>' % self.id
 
-todo_arr = []
-user_arr = []
 
 @app.route('/', methods=['GET'])
 def index():
@@ -74,15 +74,6 @@ def index_post():
             date_processing = [int(v) for v in date_processing]
             date_out = datetime.datetime(*date_processing)
             new_todo.email_date = date_out
-            # todo_arr.append(new_todo)
-            todo_file = open('todos.csv', 'w')
-            todo_file.write(f"{new_todo.person_id}, {new_todo.email_date}, {new_todo.content}")
-            todo_file.close()
-            user_file = open('users.csv', 'w')
-            user_file.write(f"{User.query.filter_by(id=new_todo.person_id).all()[0].id}, {User.query.filter_by(id=new_todo.person_id).all()[0].email}")
-            user_file.close()
-            # user_arr.append([User.query.filter_by(id=new_todo.person_id).all()[0].id,
-                             # User.query.filter_by(id=new_todo.person_id).all()[0].email])
         else:
             new_todo.email_date = None
         try:
@@ -94,6 +85,31 @@ def index_post():
             return redirect(url_for('index'))
     flash('Please sign in to do that')
     return redirect(url_for('login'))
+
+def timed_email():
+    time = datetime.datetime.now()
+    for todo in db.session.query(Todo).filter_by(email_me=True).all():
+        if str(todo.email_date).split(',')[0][0:10] == str(time).split(' ')[0]:
+            email_time = str(todo.email_date).split(',')[0].split(' ')[1][0:5]
+            if email_time == time.strftime('%H:%M'):
+                user = db.session.query(User).filter_by(id=todo.person_id).all()
+                user_email = user[0].email
+                import smtplib
+                gmailaddress = os.getenv('EMAIL')
+                gmailpassword = os.getenv('EMAIL_PASSWORD')
+                mailto = user_email
+                subject = 'Todo Reminder'
+                msg = todo.content
+                message = f"Subject: {subject}\n\n{msg}".encode('utf-8')
+                mailServer = smtplib.SMTP('smtp.gmail.com', 587)
+                mailServer.starttls()
+                mailServer.login(gmailaddress, gmailpassword)
+                mailServer.sendmail(gmailaddress, mailto, message)
+                mailServer.quit()
+
+
+
+
 
 
 @app.route('/delete/<int:id>')
@@ -177,3 +193,7 @@ def register_post():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', minute=1)
+scheduler.start()

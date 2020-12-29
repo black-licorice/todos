@@ -1,2 +1,2 @@
 web: gunicorn project.routes:app -w 4
-clock: python clock.py
+heroku ps:scale web=1
