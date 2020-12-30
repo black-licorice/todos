@@ -39,6 +39,9 @@
               <br>
               <time>Date added: {{ todo.date_added.day }}/{{ todo.date_added.month }}/{{ todo.date_added.year }}</time>
             </div>
+            {% if todo.email_me %}
+              <p id="remind-me-date"> Remind me at {{ todo.email_date.strftime('%H:%M - %d, %m, %Y') }} UTC</p>
+            {% endif %}
           </div>
           <footer class="card-footer">
             <a href="/update/{{ todo.id }}" class="card-footer-item">Update</a>

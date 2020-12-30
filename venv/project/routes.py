@@ -7,7 +7,6 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, current_user, logout_user, login_user, UserMixin
 
-
 app = Flask(__name__)
 db = SQLAlchemy(app=app)
 scheduler = APScheduler()
@@ -54,11 +53,11 @@ def index():
     if current_user.is_authenticated:
         todos = Todo.query.filter_by(person_id=current_user.id).order_by(Todo.date_added.desc()).all()
         if todos:
-            return render_template('todos.html', todos=todos, datetime=datetime.datetime)
+            return render_template('todos.html', todos=todos, datetime=datetime.datetime, current_user=User.query.filter_by(id=current_user.id).all()[0])
         flash('No todos, please add a todo')
         return render_template('todos.html', datetime=datetime.datetime)
     flash('Sign in to start adding todos')
-    return render_template('todos.html', datetime=datetime.datetime)
+    return render_template('todos.html', datetime=datetime.datetime, current_user=False)
 
 @app.route('/', methods=['POST'])
 @login_required
@@ -145,7 +144,7 @@ def update(id):
 
 @app.route('/login', methods=['GET'])
 def login():
-    return render_template('login.html')
+    return render_template('login.html', current_user=False)
 
 
 @app.route('/login', methods=['POST'])
@@ -163,7 +162,7 @@ def login_post():
 
 @app.route('/register', methods=['GET'])
 def register():
-    return render_template('register.html')
+    return render_template('register.html', current_user=False)
 
 
 @app.route('/register', methods=['POST'])
@@ -193,5 +192,5 @@ def logout():
     return redirect(url_for('login'))
 
 
-scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', seconds=30)
+scheduler.add_job(id='Timed Email', func=timed_email, trigger='interval', minutes=1)
 scheduler.start()

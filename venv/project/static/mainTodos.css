@@ -1,3 +1,5 @@
-table{
-    border: solid black 1px;
+#remind-me-date{
+    font-style: italic;
+    color: rgb(155, 25, 216);
+    float: left;
 }
